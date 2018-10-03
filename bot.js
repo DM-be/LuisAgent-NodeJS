@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 // bot.js is your main bot dialog entry point for handling activity types
 
 // Import required Bot Builder
@@ -17,6 +16,7 @@ const GREETING_INTENT = 'Greeting';
 const CANCEL_INTENT = 'Cancel';
 const HELP_INTENT = 'Help';
 const NONE_INTENT = 'None';
+const CHECKACCOUNT_INTENT = "checkAccount";
 
 
 /**
@@ -40,7 +40,6 @@ class BasicBot {
         this.luisRecognizer = new LuisRecognizer({
             applicationId: "4576b202-e5a9-4e2b-9b19-961ac2a0e831",
             endpoint: "https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/4576b202-e5a9-4e2b-9b19-961ac2a0e831?subscription-key=cbcdfd8ed0d14d48ae3b01dd8c739bbf&timezoneOffset=60&q=",
-            // CAUTION: Its better to assign and use a subscription key instead of authoring key here.
             endpointKey: "cbcdfd8ed0d14d48ae3b01dd8c739bbf"
         });
 
@@ -64,10 +63,16 @@ class BasicBot {
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
+            const entities = LuisRecognizer.entities;
 
             // Determine what we should do based on the top intent from LUIS.
-            await context.sendActivity(`Hello.` + topIntent);
+       
+
             switch (topIntent) {
+            case CHECKACCOUNT_INTENT: 
+            let account = entities[0];
+            await context.sendActivity(`so you want to check the balance from ` + account);
+            break;
             case GREETING_INTENT:
                 await context.sendActivity(`Hello.`);
             break;
