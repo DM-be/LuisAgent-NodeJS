@@ -63,7 +63,7 @@ class BasicBot {
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
-            const entities = LuisRecognizer.entities;
+            const entities = context.entities;
 
             // Determine what we should do based on the top intent from LUIS.
        
