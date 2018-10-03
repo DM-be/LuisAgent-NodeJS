@@ -5,6 +5,17 @@
 // Import required Bot Builder
 const { ActivityTypes, CardFactory } = require('botbuilder');
 const { LuisRecognizer } = require('botbuilder-ai');
+const axios = require('axios');
+const {
+    DialogSet,
+    TextPrompt,
+    ChoicePrompt,
+    ConfirmPrompt,
+    DatetimePrompt,
+    FoundChoice,
+    FoundDatetime,
+    ListStyle
+} = require('botbuilder-dialogs');
 
 const { WelcomeCard } = require('./welcomeCard');
 
@@ -42,9 +53,7 @@ class BasicBot {
             endpoint: "https://westeurope.api.cognitive.microsoft.com/luis/v2.0/apps/4576b202-e5a9-4e2b-9b19-961ac2a0e831?subscription-key=cbcdfd8ed0d14d48ae3b01dd8c739bbf&timezoneOffset=60&q=",
             endpointKey: "cbcdfd8ed0d14d48ae3b01dd8c739bbf"
         });
-
     }
-
     /**
      * Driver code that does one of the following:
      * 1. Display a welcome card upon receiving ConversationUpdate activity 
@@ -63,15 +72,21 @@ class BasicBot {
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
-            let accountLabel =  results.entities["Account"];
-
-            // Determine what we should do based on the top intent from LUIS.
-       
-
+            
             switch (topIntent) {
             case CHECKACCOUNT_INTENT: 
            // let account = entities[0];
-            await context.sendActivity(`so you want to check the balance from ` + accountLabel);
+            let accountLabel =  results.entities["Account"];
+            if(accountLabel === undefined)
+            {
+                // ask with dialogprompt
+            }
+            if(accountLabel !== undefined)
+            {
+                let amount = await axios.get(`https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`);
+            }
+
+            await context.sendActivity(`The balance of ${accountLabel} is ${amount}` );
             break;
             case GREETING_INTENT:
                 await context.sendActivity(`Hello.`);
@@ -117,5 +132,59 @@ class BasicBot {
         }
     }
 }
+
+const dialogs = new DialogSet();
+
+dialogs.add('textPrompt', new TextPrompt());
+
+dialogs.add('BalanceDialog', [
+    async function(dc){
+        let balance = Math.floor(Math.random() * Math.floor(100));
+        await dc.context.sendActivity(`Your balance is £${balance}.`);
+        await dc.continue();
+    },
+    async function(dc){
+        await dc.context.sendActivity(`OK, we're done here. What is next?`);
+        await dc.continue();
+    },
+    async function(dc){
+        await dc.end();
+    }
+]);
+
+dialogs.add('TransferDialog', [
+    async function(dc) {
+        const state = convoState.get(dc.context);
+        if (state.AccountLabel) {
+            await dc.continue();
+        } else {
+            await dc.prompt('textPrompt', `Which account do you want to transfer from? For example Joint, Current, Savings etc`);
+        }
+    },
+    async function(dc, accountLabel) {
+        const state = convoState.get(dc.context);
+        // Save accountLabel
+        if (!state.AccountLabel) {
+            state.AccountLabel = accountLabel;
+        }
+        
+        //continue
+        await dc.continue();
+    },
+    async function(dc) {
+        const state = convoState.get(dc.context);
+        await dc.context.sendActivity(`AccountLabel: ${state.AccountLabel}`);
+
+        //continue
+        await dc.continue();
+    },    
+    async function(dc){
+        await dc.context.sendActivity(`OK, we're done here. What is next?`);
+        await dc.continue();
+    },
+    async function(dc){
+        await dc.end();
+    }
+]);
 
 module.exports.BasicBot = BasicBot
