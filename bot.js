@@ -63,15 +63,15 @@ class BasicBot {
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
-            const entities = context.entities;
+            let entities = context.entities;
 
             // Determine what we should do based on the top intent from LUIS.
        
 
             switch (topIntent) {
             case CHECKACCOUNT_INTENT: 
-            let account = entities[0];
-            await context.sendActivity(`so you want to check the balance from ` + account);
+           // let account = entities[0];
+            await context.sendActivity(`so you want to check the balance from ` + entities);
             break;
             case GREETING_INTENT:
                 await context.sendActivity(`Hello.`);
