@@ -133,58 +133,58 @@ class BasicBot {
     }
 }
 
-const dialogs = new DialogSet();
+// const dialogs = new DialogSet();
 
-dialogs.add('textPrompt', new TextPrompt());
+// dialogs.add('textPrompt', new TextPrompt());
 
-dialogs.add('BalanceDialog', [
-    async function(dc){
-        let balance = Math.floor(Math.random() * Math.floor(100));
-        await dc.context.sendActivity(`Your balance is £${balance}.`);
-        await dc.continue();
-    },
-    async function(dc){
-        await dc.context.sendActivity(`OK, we're done here. What is next?`);
-        await dc.continue();
-    },
-    async function(dc){
-        await dc.end();
-    }
-]);
+// dialogs.add('BalanceDialog', [
+//     async function(dc){
+//         let balance = Math.floor(Math.random() * Math.floor(100));
+//         await dc.context.sendActivity(`Your balance is £${balance}.`);
+//         await dc.continue();
+//     },
+//     async function(dc){
+//         await dc.context.sendActivity(`OK, we're done here. What is next?`);
+//         await dc.continue();
+//     },
+//     async function(dc){
+//         await dc.end();
+//     }
+// ]);
 
-dialogs.add('TransferDialog', [
-    async function(dc) {
-        const state = convoState.get(dc.context);
-        if (state.AccountLabel) {
-            await dc.continue();
-        } else {
-            await dc.prompt('textPrompt', `Which account do you want to transfer from? For example Joint, Current, Savings etc`);
-        }
-    },
-    async function(dc, accountLabel) {
-        const state = convoState.get(dc.context);
-        // Save accountLabel
-        if (!state.AccountLabel) {
-            state.AccountLabel = accountLabel;
-        }
+// dialogs.add('TransferDialog', [
+//     async function(dc) {
+//         const state = convoState.get(dc.context);
+//         if (state.AccountLabel) {
+//             await dc.continue();
+//         } else {
+//             await dc.prompt('textPrompt', `Which account do you want to transfer from? For example Joint, Current, Savings etc`);
+//         }
+//     },
+//     async function(dc, accountLabel) {
+//         const state = convoState.get(dc.context);
+//         // Save accountLabel
+//         if (!state.AccountLabel) {
+//             state.AccountLabel = accountLabel;
+//         }
         
-        //continue
-        await dc.continue();
-    },
-    async function(dc) {
-        const state = convoState.get(dc.context);
-        await dc.context.sendActivity(`AccountLabel: ${state.AccountLabel}`);
+//         //continue
+//         await dc.continue();
+//     },
+//     async function(dc) {
+//         const state = convoState.get(dc.context);
+//         await dc.context.sendActivity(`AccountLabel: ${state.AccountLabel}`);
 
-        //continue
-        await dc.continue();
-    },    
-    async function(dc){
-        await dc.context.sendActivity(`OK, we're done here. What is next?`);
-        await dc.continue();
-    },
-    async function(dc){
-        await dc.end();
-    }
-]);
+//         //continue
+//         await dc.continue();
+//     },    
+//     async function(dc){
+//         await dc.context.sendActivity(`OK, we're done here. What is next?`);
+//         await dc.continue();
+//     },
+//     async function(dc){
+//         await dc.end();
+//     }
+// ]);
 
 module.exports.BasicBot = BasicBot
