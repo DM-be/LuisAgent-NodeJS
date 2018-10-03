@@ -84,12 +84,10 @@ class BasicBot {
             }
             if(accountLabel !== undefined)
             {
-                const res = await axios.get(`https://nestjsbackend.herokuapp.com/accounts/`, {params: accountLabel});
-                const data = res.data;
-            
-               
-                console.log(res);
-                await context.sendActivity(`The balance of ${accountLabel} is ${data}` );
+                let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
+                const res = await axios.get(url);
+                const amountLeft = res.data;
+                await context.sendActivity(`The balance of ${accountLabel} is ${amountLeft}` );
             }
 
             
