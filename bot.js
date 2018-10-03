@@ -80,11 +80,15 @@ class BasicBot {
             if(accountLabel === undefined)
             {
                 // ask with dialogprompt
+                await context.sendActivity(`no accountlabel is defined` );
             }
             if(accountLabel !== undefined)
             {
-                let amount = await axios.get(`https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`);
-                await context.sendActivity(`The balance of ${accountLabel} is ${amount}` );
+                const res = await axios.get(`https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`);
+                const { data } = res.data;
+                
+               
+                await context.sendActivity(`The balance of ${accountLabel} is ${data}` );
             }
 
             
