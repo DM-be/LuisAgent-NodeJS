@@ -84,9 +84,10 @@ class BasicBot {
             if(accountLabel !== undefined)
             {
                 let amount = await axios.get(`https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`);
+                await context.sendActivity(`The balance of ${accountLabel} is ${amount}` );
             }
 
-            await context.sendActivity(`The balance of ${accountLabel} is ${amount}` );
+            
             break;
             case GREETING_INTENT:
                 await context.sendActivity(`Hello.`);
