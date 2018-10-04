@@ -138,7 +138,6 @@ class BasicBot {
             {
                 await dc.beginDialog(WHO_ARE_YOU);
             }
-            await dc.continueDialog();
             
 
             switch (topIntent) {
