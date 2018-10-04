@@ -13,7 +13,8 @@ import {
     RecognizerResult
 } from 'botbuilder';
 import {
-    LuisRecognizer, IntentData
+    LuisRecognizer,
+    IntentData
 } from 'botbuilder-ai';
 
 import * as axios from 'axios/dist/axios'
@@ -28,7 +29,7 @@ import {
     DialogTurnResult,
     WaterfallStep,
     WaterfallStepContext
-} from 'botbuilder-dialogs' 
+} from 'botbuilder-dialogs'
 
 
 
@@ -37,19 +38,19 @@ const LUIS_CONFIGURATION: string = 'BasicBotLuisApplication';
 
 // Supported LUIS Intents.
 const GREETING_INTENT: string = 'Greeting';
-const CANCEL_INTENT: string  = 'Cancel';
-const HELP_INTENT: string  = 'Help';
-const NONE_INTENT: string  = 'None';
-const CHECKACCOUNT_INTENT: string  = "checkAccount";
+const CANCEL_INTENT: string = 'Cancel';
+const HELP_INTENT: string = 'Help';
+const NONE_INTENT: string = 'None';
+const CHECKACCOUNT_INTENT: string = "checkAccount";
 
 // persistent state properties
-const DIALOG_STATE_PROPERTY: string  = 'dialogState';
-const USER_NAME_PROP: string  = 'user_name';
+const DIALOG_STATE_PROPERTY: string = 'dialogState';
+const USER_NAME_PROP: string = 'user_name';
 
 // dialog references
-const WHO_ARE_YOU: string  = 'who_are_you';
-const HELLO_USER: string  = 'hello_user';
-const NAME_PROMPT: string  = 'name_prompt';
+const WHO_ARE_YOU: string = 'who_are_you';
+const HELLO_USER: string = 'hello_user';
+const NAME_PROMPT: string = 'name_prompt';
 
 
 /**
@@ -96,28 +97,28 @@ export class BasicBot {
             endpointKey: "cbcdfd8ed0d14d48ae3b01dd8c739bbf"
         });
 
-    
-    }
-    
 
-    
-    async askForName(dc: DialogContext, step): Promise<DialogTurnResult> {
-       // return dc.prompt()
+    }
+
+
+
+    async askForName(dc: DialogContext, step): Promise < DialogTurnResult > {
+        // return dc.prompt()
         return await dc.prompt(NAME_PROMPT, `Hello and welcome, what is your name?`);
-        
+
     }
     // The second step in this waterfall collects the response, stores it in
     // the state accessor, then displays it.
-    async collectAndDisplayName(step: WaterfallStepContext): Promise<DialogTurnResult>{
+    async collectAndDisplayName(step: WaterfallStepContext): Promise < DialogTurnResult > {
         await this.userName.set(step.context, step.result);
         await step.context.sendActivity(`Got it. You are ${ step.result }.`);
         return await step.endDialog();
     }
     // This step loads the user's name from state and displays it.
-    async displayName(step: WaterfallStepContext): Promise<DialogTurnResult> {
+    async displayName(step: WaterfallStepContext): Promise < DialogTurnResult > {
         const userName = await this.userName.get(step.context);
         await step.context.sendActivity(`Your name is ${ userName }.`);
-        return await step.endDialog(); 
+        return await step.endDialog();
     }
 
 
@@ -135,12 +136,11 @@ export class BasicBot {
         if (context.activity.type === ActivityTypes.Message) {
 
             // Create dialog context
-            
+
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results: RecognizerResult = await this.luisRecognizer.recognize(context);
             let userName = await this.userName.get(dc.context);
-            if(userName)
-            {
+            if (userName) {
                 const topIntent: string = LuisRecognizer.topIntent(results);
                 switch (topIntent) {
                     case CHECKACCOUNT_INTENT:
@@ -148,7 +148,7 @@ export class BasicBot {
                         let accountLabel = results.entities["Account"];
                         if (accountLabel === undefined) {
                             // ask with dialogprompt
-    
+
                             await context.sendActivity(`no accountlabel is defined`);
                         }
                         if (accountLabel !== undefined) {
@@ -157,8 +157,8 @@ export class BasicBot {
                             const amountLeft = res.data;
                             await context.sendActivity(`The balance of ${accountLabel} is ${amountLeft}`);
                         }
-    
-    
+
+
                         break;
                     case GREETING_INTENT:
                         await context.sendActivity(`Hello.`);
@@ -177,13 +177,20 @@ export class BasicBot {
                         await context.sendActivity(`I didn't understand what you just said to me.`);
                         break;
                 }
+            } else {
+                await dc.beginDialog(WHO_ARE_YOU);
             }
-            else {
-               await dc.beginDialog(WHO_ARE_YOU);
-            }
-            
+
+            // Save changes to the user name.
+            await this.userState.saveChanges(context);
+
+            // End this turn by saving changes to the conversation state.
+            await this.conversationState.saveChanges(context);
+
+
+
             // const utterance = (turnContext.activity.text || '').trim().toLowerCase();
-            
+
             // Continue the current dialog
             //  if (!context.responded) {
             //     await dc.continueDialog();
@@ -199,7 +206,7 @@ export class BasicBot {
             //     }
             // }
 
-            
+
 
         }
         // Handle ConversationUpdate activity type, which is used to indicates new members add to 
@@ -230,11 +237,7 @@ export class BasicBot {
                 }
             }
         }
-        // Save changes to the user name.
-        await this.userState.saveChanges(context);
 
-        // End this turn by saving changes to the conversation state.
-        await this.conversationState.saveChanges(context);
     }
 }
 

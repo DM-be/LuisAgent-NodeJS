@@ -144,6 +144,10 @@ class BasicBot {
                 else {
                     yield dc.beginDialog(WHO_ARE_YOU);
                 }
+                // Save changes to the user name.
+                yield this.userState.saveChanges(context);
+                // End this turn by saving changes to the conversation state.
+                yield this.conversationState.saveChanges(context);
                 // const utterance = (turnContext.activity.text || '').trim().toLowerCase();
                 // Continue the current dialog
                 //  if (!context.responded) {
@@ -185,10 +189,6 @@ class BasicBot {
                     }
                 }
             }
-            // Save changes to the user name.
-            yield this.userState.saveChanges(context);
-            // End this turn by saving changes to the conversation state.
-            yield this.conversationState.saveChanges(context);
         });
     }
 }
