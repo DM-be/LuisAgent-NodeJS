@@ -96,7 +96,9 @@ class BasicBot {
     }
 
     async askForName(dc, step) {
+       // return dc.prompt()
         return await dc.prompt(NAME_PROMPT, `What is your name, human?`);
+        
     }
     // The second step in this waterfall collects the response, stores it in
     // the state accessor, then displays it.
@@ -132,6 +134,7 @@ class BasicBot {
             
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
+            
             const topIntent = LuisRecognizer.topIntent(results);
             // const utterance = (turnContext.activity.text || '').trim().toLowerCase();
             
