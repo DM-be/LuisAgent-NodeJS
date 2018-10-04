@@ -77,7 +77,7 @@ export class BasicBot {
 
         this.dialogSet = new DialogSet(this.dialogState);
         this.dialogSet.add(new TextPrompt(NAME_PROMPT)); // TODO: refactor in own pages - per dialog subject (intent)
-
+        this.dialogSet.add(this.askForAccountName.bind(this));
         // Create a dialog that asks the user for their name.
         this.dialogSet.add(new WaterfallDialog(WHO_ARE_YOU, [
             this.askForName.bind(this),

@@ -46,6 +46,7 @@ class BasicBot {
         this.userName = this.userState.createProperty(USER_NAME_PROP);
         this.dialogSet = new botbuilder_dialogs_1.DialogSet(this.dialogState);
         this.dialogSet.add(new botbuilder_dialogs_1.TextPrompt(NAME_PROMPT)); // TODO: refactor in own pages - per dialog subject (intent)
+        this.dialogSet.add(this.askForAccountName.bind(this));
         // Create a dialog that asks the user for their name.
         this.dialogSet.add(new botbuilder_dialogs_1.WaterfallDialog(WHO_ARE_YOU, [
             this.askForName.bind(this),
