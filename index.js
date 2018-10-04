@@ -13,7 +13,7 @@ const { BotFrameworkAdapter, MemoryStorage, ConversationState, UserState } = req
 const { BotConfiguration } = require('botframework-config');
 
 // This bot's main dialog.
-const { BasicBot } = require('./bot2');
+const { BasicBot } = require('./bot');
 
 // Read botFilePath and botFileSecret from .env file
 // Note: Ensure you have a .env file and include botFilePath and botFileSecret.
