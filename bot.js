@@ -72,6 +72,12 @@ class BasicBot {
             return yield dc.prompt(NAME_PROMPT, `Hello and welcome, what is your name?`);
         });
     }
+    askForAccountName(dc, userName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // return dc.prompt()
+            return yield dc.prompt('accountNamePrompt', `what account would you like to check ${userName} ?`);
+        });
+    }
     // The second step in this waterfall collects the response, stores it in
     // the state accessor, then displays it.
     collectAndDisplayName(step) {
@@ -103,6 +109,7 @@ class BasicBot {
             if (context.activity.type === botbuilder_1.ActivityTypes.Message) {
                 // Create dialog context
                 const dc = yield this.dialogSet.createContext(context);
+                console.log(dc);
                 yield dc.continueDialog(); // continue if there is a dialog running 
                 // Perform a call to LUIS to retrieve results for the current activity message.
                 const results = yield this.luisRecognizer.recognize(context);
@@ -115,7 +122,11 @@ class BasicBot {
                             let accountLabel = results.entities["Account"];
                             if (accountLabel === undefined) {
                                 // ask with dialogprompt
-                                yield context.sendActivity(`no accountlabel is defined`);
+                                let accountLabel = yield dc.beginDialog('accountNamePrompt', userName);
+                                let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
+                                const res = yield axios_1.default.get(url);
+                                const amountLeft = res.data;
+                                yield context.sendActivity(`The balance of ${accountLabel} is ${amountLeft}`);
                             }
                             if (accountLabel !== undefined) {
                                 let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;

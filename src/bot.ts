@@ -105,8 +105,13 @@ export class BasicBot {
     async askForName(dc: DialogContext, step): Promise < DialogTurnResult > {
         // return dc.prompt()
         return await dc.prompt(NAME_PROMPT, `Hello and welcome, what is your name?`);
-
     }
+
+    async askForAccountName(dc: DialogContext, userName: string): Promise < DialogTurnResult > {
+        // return dc.prompt()
+        return await dc.prompt('accountNamePrompt', `what account would you like to check ${userName} ?`);
+    }
+
     // The second step in this waterfall collects the response, stores it in
     // the state accessor, then displays it.
     async collectAndDisplayName(step: WaterfallStepContext): Promise < DialogTurnResult > {
@@ -120,6 +125,7 @@ export class BasicBot {
         await step.context.sendActivity(`Your name is ${ userName }.`);
         return await step.endDialog();
     }
+    
 
 
     /**
@@ -137,6 +143,7 @@ export class BasicBot {
 
             // Create dialog context
             const dc: DialogContext = await this.dialogSet.createContext(context);
+            console.log(dc);
             await dc.continueDialog(); // continue if there is a dialog running 
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results: RecognizerResult = await this.luisRecognizer.recognize(context);
@@ -149,8 +156,11 @@ export class BasicBot {
                         let accountLabel = results.entities["Account"];
                         if (accountLabel === undefined) {
                             // ask with dialogprompt
-
-                            await context.sendActivity(`no accountlabel is defined`);
+                            let accountLabel = await dc.beginDialog('accountNamePrompt', userName);
+                            let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
+                            const res = await axios.get(url);
+                            const amountLeft = res.data;
+                            await context.sendActivity(`The balance of ${accountLabel} is ${amountLeft}`);
                         }
                         if (accountLabel !== undefined) {
                             let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
