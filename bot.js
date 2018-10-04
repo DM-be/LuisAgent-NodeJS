@@ -140,14 +140,14 @@ class BasicBot {
             // }
 
             // Show menu if no response sent
-            if (!context.responded) {
-                var userName = await this.userName.get(dc.context, null);
-                if (userName) {
-                    await dc.beginDialog(HELLO_USER);
-                } else {
-                    await dc.beginDialog(WHO_ARE_YOU);
-                }
-            }
+            // if (!context.responded) {
+            //     var userName = await this.userName.get(dc.context, null);
+            //     if (userName) {
+            //         await dc.beginDialog(HELLO_USER);
+            //     } else {
+            //         await dc.beginDialog(WHO_ARE_YOU);
+            //     }
+            // }
 
             switch (topIntent) {
                 case CHECKACCOUNT_INTENT:
@@ -207,6 +207,7 @@ class BasicBot {
                         //  await context.sendActivity({
                         //      attachments: [welcomeCard]
                         //  });
+                        await dc.beginDialog(WHO_ARE_YOU);
 
 
                     }
