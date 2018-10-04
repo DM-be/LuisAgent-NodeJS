@@ -76,8 +76,9 @@ export class BasicBot {
         this.userName = this.userState.createProperty(USER_NAME_PROP);
 
         this.dialogSet = new DialogSet(this.dialogState);
-        this.dialogSet.add(new TextPrompt(NAME_PROMPT)); // TODO: refactor in own pages - per dialog subject (intent)
-        this.dialogSet.add(this.askForAccountName.bind(this));
+        this.dialogSet.add(new TextPrompt(NAME_PROMPT));
+        this.dialogSet.add(new TextPrompt('accountNamePrompt')) // TODO: refactor in own pages - per dialog subject (intent)
+       // this.dialogSet.add(this.askForAccountName.bind(this));
         // Create a dialog that asks the user for their name.
         this.dialogSet.add(new WaterfallDialog(WHO_ARE_YOU, [
             this.askForName.bind(this),
@@ -156,7 +157,7 @@ export class BasicBot {
                         let accountLabel = results.entities["Account"];
                         if (accountLabel === undefined) {
                             // ask with dialogprompt
-                            let accountLabel = await dc.beginDialog('accountNamePrompt', userName);
+                            let accountLabel = await dc.prompt('accountNamePrompt', `what account would you like to check ${userName} ?`);
                             let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
                             const res = await axios.get(url);
                             const amountLeft = res.data;
