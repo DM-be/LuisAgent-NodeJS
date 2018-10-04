@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Import required Bot Builder
 const botbuilder_1 = require("botbuilder");
 const botbuilder_ai_1 = require("botbuilder-ai");
-const axios = require("axios/dist/axios");
+const axios_1 = require("axios");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
 // LUIS service type entry as defined in the .bot file.
 const LUIS_CONFIGURATION = 'BasicBotLuisApplication';
@@ -119,7 +119,7 @@ class BasicBot {
                             }
                             if (accountLabel !== undefined) {
                                 let url = `https://nestjsbackend.herokuapp.com/accounts/${accountLabel}`;
-                                const res = yield axios.get(url);
+                                const res = yield axios_1.default.get(url);
                                 const amountLeft = res.data;
                                 yield context.sendActivity(`The balance of ${accountLabel} is ${amountLeft}`);
                             }

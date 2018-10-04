@@ -17,7 +17,7 @@ import {
     IntentData
 } from 'botbuilder-ai';
 
-import * as axios from 'axios/dist/axios'
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 
 import {
     DialogSet,
