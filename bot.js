@@ -100,9 +100,10 @@ class BasicBot {
             // Handle Message activity type, which is the main activity type for shown within a conversational interface
             // Message activities may contain text, speech, interactive cards, and binary or unknown attachments.
             // see https://aka.ms/about-bot-activity-message to learn more about the message and other activity types        
-            const dc = yield this.dialogSet.createContext(context);
             if (context.activity.type === botbuilder_1.ActivityTypes.Message) {
                 // Create dialog context
+                const dc = yield this.dialogSet.createContext(context);
+                yield dc.continueDialog(); // continue if there is a dialog running 
                 // Perform a call to LUIS to retrieve results for the current activity message.
                 const results = yield this.luisRecognizer.recognize(context);
                 let userName = yield this.userName.get(dc.context);
