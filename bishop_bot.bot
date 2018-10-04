@@ -2,7 +2,7 @@
   "name": "bishop_bot",
   "padlock": "cP70ftlMGeHsQv1Fr+MAPQ==!ti8ifEBcZFycmnCuckOSuC+1ap29eo4qmKqoWzcad5sQ89UHp8k0d71iEMB5bnU2",
   "version": "2.0",
-  "secretKey": "bNbAJQmd6EVLb7VovVASnR5s3sqsVPgeHDiKuvF4mYk="
+  "secretKey": "bNbAJQmd6EVLb7VovVASnR5s3sqsVPgeHDiKuvF4mYk=",
   "services": [
     {
       "tenantId": "4ded4bb1-6bff-42b3-aed7-6a36a503bf7a",
