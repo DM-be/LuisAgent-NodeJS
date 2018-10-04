@@ -196,9 +196,9 @@ class BasicBot {
                         // we will send our Welcome Adaptive Card.  This will only be sent once, when the Bot joins conversation
                         // To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
                         // const welcomeCard = CardFactory.adaptiveCard(WelcomeCard);
-                         await context.sendActivity({
-                             attachments: [welcomeCard]
-                         });
+                        //  await context.sendActivity({
+                        //      attachments: [welcomeCard]
+                        //  });
 
 
                     }
