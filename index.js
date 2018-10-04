@@ -91,7 +91,7 @@ userState = new UserState(memoryStorage);
 // Create the main dialog.
 let bot;
 try {
-    bot = new BasicBot(botConfig);
+    bot = new BasicBot(botConfig, conversationState, userState);
 } catch (err) {
     console.error(`[botInitializationError]: ${ err }`);
     process.exit();
