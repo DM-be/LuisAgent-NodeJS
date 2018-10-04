@@ -60,7 +60,7 @@ const NAME_PROMPT: string  = 'name_prompt';
  *  Displaying a Welcome Card, using Adaptive Card technology
  *  Use LUIS to model Greetings, Help, and Cancel interactions
  */
-class BasicBot {
+export class BasicBot {
     /**
      * @param {BotConfiguration} botConfig contents of the .bot file
      * @param {Object} conversationState state store for the conversation (ACCESSOR)
