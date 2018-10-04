@@ -141,12 +141,13 @@ class BasicBot {
 
             // Show menu if no response sent
             if (!context.responded) {
-                let userName = await this.userName.get(dc.context, null);
+                var userName = await this.userName.get(dc.context, null);
                 if (userName) {
                     await dc.beginDialog(HELLO_USER);
                 } else {
                     await dc.beginDialog(WHO_ARE_YOU);
                 }
+            }
 
             switch (topIntent) {
                 case CHECKACCOUNT_INTENT:
