@@ -31,9 +31,6 @@ import {
 } from 'botbuilder-dialogs' 
 
 
-import {
-    WelcomeCard
-} from './welcomeCard'
 
 // LUIS service type entry as defined in the .bot file.
 const LUIS_CONFIGURATION: string = 'BasicBotLuisApplication';
