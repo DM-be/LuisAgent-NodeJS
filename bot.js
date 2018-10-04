@@ -128,7 +128,7 @@ class BasicBot {
             
 
             // Create dialog context
-            const dc = await this.dialogs.createContext(turnContext);
+            const dc = await this.dialogs.createContext(context);
             // Perform a call to LUIS to retrieve results for the current activity message.
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
