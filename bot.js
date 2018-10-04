@@ -19,7 +19,8 @@ const {
     DatetimePrompt,
     FoundChoice,
     FoundDatetime,
-    ListStyle
+    ListStyle, 
+    WaterfallDialog
 } = require('botbuilder-dialogs');
 
 
