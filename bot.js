@@ -133,12 +133,20 @@ class BasicBot {
             const results = await this.luisRecognizer.recognize(context);
             const topIntent = LuisRecognizer.topIntent(results);
             // const utterance = (turnContext.activity.text || '').trim().toLowerCase();
-            let userName = await this.userName.get(dc.context, null);
-            if(!userName)
-            {
-                await dc.beginDialog(WHO_ARE_YOU);
-            }
             
+            // Continue the current dialog
+             if (!context.responded) {
+                await dc.continueDialog();
+            }
+
+            // Show menu if no response sent
+            if (!context.responded) {
+                let userName = await this.userName.get(dc.context, null);
+                if (userName) {
+                    await dc.beginDialog(HELLO_USER);
+                } else {
+                    await dc.beginDialog(WHO_ARE_YOU);
+                }
 
             switch (topIntent) {
                 case CHECKACCOUNT_INTENT:
@@ -204,6 +212,11 @@ class BasicBot {
                 }
             }
         }
+        // Save changes to the user name.
+        await this.userState.saveChanges(context);
+
+        // End this turn by saving changes to the conversation state.
+        await this.conversationState.saveChanges(context);
     }
 }
 
