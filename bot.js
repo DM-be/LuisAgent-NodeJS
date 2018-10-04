@@ -134,10 +134,10 @@ class BasicBot {
             const topIntent = LuisRecognizer.topIntent(results);
             // const utterance = (turnContext.activity.text || '').trim().toLowerCase();
             
-            // Continue the current dialog
-             if (!context.responded) {
-                await dc.continueDialog();
-            }
+            // // Continue the current dialog
+            //  if (!context.responded) {
+            //     await dc.continueDialog();
+            // }
 
             // Show menu if no response sent
             if (!context.responded) {
