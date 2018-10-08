@@ -208,7 +208,7 @@ class BasicBot {
             const LUISResults = yield this.luisRecognizer.recognize(turnContext);
             // Return new instance of on turn property from LUIS results.
             // Leverages static fromLUISResults method
-            return onTurnProperty_1.OnTurnProperty.fromLUISResults(LUISResults);
+            return onTurnProperty_1.OnTurnProperty.getOnTurnPropertyFromLuisResults(LUISResults);
         });
     }
     /**

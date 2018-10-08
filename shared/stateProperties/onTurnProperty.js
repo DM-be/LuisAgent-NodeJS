@@ -9,13 +9,29 @@ class OnTurnProperty {
     getEntityProperties() {
         return this.entities;
     }
+    addEntityProperty(entityProperty) {
+        this.entities.push(entityProperty);
+    }
     constructor(intent, entities) {
         this.intent = intent || '';
         this.entities = entities || [];
     }
+    setIntent(intent) {
+        this.intent = intent;
+    }
+    /**
+   *
+   * Method to get entity by name, returns EntityProperty or undefined if does not exist
+   *
+   * @param {string} entityName
+   * @returns {EntityProperty} entityProperty or undefined
+   */
     getEntityByName(entityName) {
         let i = this.entities.findIndex((entity) => entity.name === entityName);
-        return this.entities[i];
+        if (i !== -1) {
+            return this.entities[i];
+        }
+        return undefined;
     }
     /**
      *
@@ -24,18 +40,19 @@ class OnTurnProperty {
      * @param {Object} LUISResults
      * @returns {OnTurnProperty}
      */
-    static fromLUISResults(LUISResults) {
+    static getOnTurnPropertyFromLuisResults(LUISResults) {
         let LUIS_ENTITIES = ['Account']; // add more in central helper
-        let onTurnProperties = new OnTurnProperty();
-        onTurnProperties.intent = botbuilder_ai_1.LuisRecognizer.topIntent(LUISResults);
+        let onTurnProperty = new OnTurnProperty();
+        onTurnProperty.setIntent(botbuilder_ai_1.LuisRecognizer.topIntent(LUISResults));
         // Gather entity values if available. Uses a const list of LUIS entity names.
         LUIS_ENTITIES.forEach(luisEntity => {
             if (luisEntity in LUISResults.entities) {
-                onTurnProperties.entities.push(new entityProperty_1.EntityProperty(luisEntity, LUISResults.entities[luisEntity]));
+                onTurnProperty.addEntityProperty(new entityProperty_1.EntityProperty(luisEntity, LUISResults.entities[luisEntity]));
             }
         });
-        return onTurnProperties;
+        return onTurnProperty;
     }
+    //TODO: refactor 
     /**
      *
      * Static method to create an on turn property object from card input

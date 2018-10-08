@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const checkAccountBalanceDialog_1 = require("./../checkAccountBalance/checkAccountBalanceDialog");
 const whatCanYouDo_1 = require("./../whatCanYouDo/whatCanYouDo");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
 // dialog name
@@ -15,6 +16,8 @@ const MAIN_DISPATCHER_DIALOG = 'MainDispatcherDialog';
 // const for state properties
 const USER_PROFILE_PROPERTY = 'userProfile';
 const MAIN_DISPATCHER_STATE_PROPERTY = 'mainDispatcherState';
+const ACCOUNT_NAME_PROPERTY = 'accountNameProperty';
+// todo: cleanup 
 // const for cancel and none intent names
 const NONE_INTENT = 'None';
 const CANCEL_INTENT = 'Cancel';
@@ -22,6 +25,7 @@ const ACCOUNT_PROMPT = 'accountPrompt';
 // Query property from ../whatCanYouDo/resources/whatCanYHouDoCard.json
 // When user responds to what can you do card, a query property is set in response.
 const QUERY_PROPERTY = 'query';
+// end todo
 class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
     // private dialogs: DialogSet;
     /**
@@ -31,6 +35,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
         * @param {StatePropertyAccessor} onTurnAccessor
         * @param {ConversationState} conversationState
         * @param {UserState} userState
+        * @param {StatePropertyAccessor} accountNameAccessor // sets the accountName string for checking balances
         */
     constructor(botConfig, onTurnAccessor, conversationState, userState) {
         super(MAIN_DISPATCHER_DIALOG);
@@ -49,6 +54,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
         // Create state objects for user, conversation and dialog states.
         this.userProfileAccessor = conversationState.createProperty(USER_PROFILE_PROPERTY);
         this.mainDispatcherAccessor = conversationState.createProperty(MAIN_DISPATCHER_STATE_PROPERTY);
+        this.accountNameAccessor = conversationState.createProperty(ACCOUNT_NAME_PROPERTY);
         this.dialogs = new botbuilder_dialogs_1.DialogSet(this.mainDispatcherAccessor);
         this.addDialog(new whatCanYouDo_1.WhatCanYouDoDialog());
         this.addDialog(new botbuilder_dialogs_1.TextPrompt(ACCOUNT_PROMPT));
@@ -56,6 +62,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
             this.askForAccountLabel.bind(this),
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
+        this.addDialog(new checkAccountBalanceDialog_1.CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor));
     }
     static getName() {
         return MAIN_DISPATCHER_DIALOG;
@@ -163,17 +170,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
         return __awaiter(this, void 0, void 0, function* () {
             switch (onTurnProperty.getIntent()) {
                 case 'checkAccount':
-                    let accountLabelEntity = onTurnProperty.getEntityByName('Account');
-                    if (accountLabelEntity) {
-                        let accountLabelName = accountLabelEntity.value;
-                        console.log('made the api call here ');
-                    }
-                    if (accountLabelEntity === undefined) {
-                        // prompt 
-                        this.onTurnAccessor.set(dc.context, onTurnProperty);
-                        return yield dc.beginDialog('giveAccount');
-                        // make call
-                    }
+                    return yield dc.beginDialog(checkAccountBalanceDialog_1.CheckAccountBalanceDialog.getName());
                 //return await dc.endDialog();
                 // return await this.beginWhatCanYouDoDialog(dc, onTurnProperty);
                 // return

@@ -38,10 +38,19 @@ export class OnTurnProperty {
         this.intent = intent;
     }
 
-
+      /**
+     *
+     * Method to get entity by name, returns EntityProperty or undefined if does not exist
+     *
+     * @param {string} entityName
+     * @returns {EntityProperty} entityProperty or undefined
+     */
     public getEntityByName(entityName: string): EntityProperty {
         let i = this.entities.findIndex((entity: EntityProperty) => entity.name === entityName);
-        return this.entities[i];
+        if(i !== -1){
+            return this.entities[i];
+        }
+        return undefined;
     }
     /**
      *

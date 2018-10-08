@@ -1,3 +1,4 @@
+import { CheckAccountBalanceDialog } from './../checkAccountBalance/checkAccountBalanceDialog';
 import { OnTurnProperty } from './../../shared/stateProperties/onTurnProperty';
 import { WhatCanYouDoDialog } from './../whatCanYouDo/whatCanYouDo';
 import {
@@ -17,6 +18,10 @@ const MAIN_DISPATCHER_DIALOG = 'MainDispatcherDialog';
 // const for state properties
 const USER_PROFILE_PROPERTY = 'userProfile';
 const MAIN_DISPATCHER_STATE_PROPERTY = 'mainDispatcherState';
+const ACCOUNT_NAME_PROPERTY = 'accountNameProperty'
+
+
+// todo: cleanup 
 
 // const for cancel and none intent names
 const NONE_INTENT = 'None';
@@ -27,6 +32,8 @@ const ACCOUNT_PROMPT = 'accountPrompt';
 // When user responds to what can you do card, a query property is set in response.
 const QUERY_PROPERTY = 'query';
 
+// end todo
+
 export class MainDispatcher extends ComponentDialog {
     static getName() {
         return MAIN_DISPATCHER_DIALOG;
@@ -34,16 +41,19 @@ export class MainDispatcher extends ComponentDialog {
 
     private userProfileAccessor: StatePropertyAccessor;
     private mainDispatcherAccessor: StatePropertyAccessor;
+    private accountNameAccessor: StatePropertyAccessor;
    // private dialogs: DialogSet;
 
  /**
      * Constructor.
      *
      * @param {BotConfiguration} botConfig bot configuration
-     * @param {StatePropertyAccessor} onTurnAccessor
+     * @param {StatePropertyAccessor} onTurnAccessor 
      * @param {ConversationState} conversationState
      * @param {UserState} userState
+     * @param {StatePropertyAccessor} accountNameAccessor // sets the accountName string for checking balances
      */
+    
 
     constructor(private botConfig: any, private onTurnAccessor: StatePropertyAccessor, private conversationState: ConversationState, private userState: UserState) {
         super(MAIN_DISPATCHER_DIALOG);
@@ -55,14 +65,16 @@ export class MainDispatcher extends ComponentDialog {
         // Create state objects for user, conversation and dialog states.
         this.userProfileAccessor = conversationState.createProperty(USER_PROFILE_PROPERTY);
         this.mainDispatcherAccessor = conversationState.createProperty(MAIN_DISPATCHER_STATE_PROPERTY);
+        this.accountNameAccessor = conversationState.createProperty(ACCOUNT_NAME_PROPERTY);
+        
         this.dialogs = new DialogSet(this.mainDispatcherAccessor);
         this.addDialog(new WhatCanYouDoDialog());
         this.addDialog(new TextPrompt(ACCOUNT_PROMPT));
-
         this.addDialog(new WaterfallDialog('giveAccount', [
             this.askForAccountLabel.bind(this),
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
+        this.addDialog(new CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor))
         
 
     }
@@ -175,22 +187,7 @@ export class MainDispatcher extends ComponentDialog {
         async beginChildDialog(dc: DialogContext, onTurnProperty: OnTurnProperty): Promise<any> {
             switch (onTurnProperty.getIntent()) {
              case 'checkAccount':
-                let accountLabelEntity = onTurnProperty.getEntityByName('Account');
-                if(accountLabelEntity) {
-                    let accountLabelName = accountLabelEntity.value;
-                    console.log('made the api call here ');
-                }
-                if(accountLabelEntity === undefined)
-                {
-                    // prompt 
-                    
-                    this.onTurnAccessor.set(dc.context,onTurnProperty);
-                    return await dc.beginDialog('giveAccount');
-                   
-                    // make call
-
-                }
-
+             return await dc.beginDialog(CheckAccountBalanceDialog.getName());
                 //return await dc.endDialog();
            // return await this.beginWhatCanYouDoDialog(dc, onTurnProperty);
               // return
