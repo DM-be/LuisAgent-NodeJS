@@ -73,8 +73,8 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
         const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(step.context);
         let accountName = onTurnProperty.getEntityByName('Account');
         if (accountName !== undefined) {
-            await this.accountNameAccessor.set(step.context, accountName.value);
-            return await step.next(accountName.value);
+            await this.accountNameAccessor.set(step.context, accountName.getValue());
+            return await step.next(accountName.getValue());
         } else return await step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
     }
     /**
@@ -85,7 +85,7 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
     async checkAccountBalance(step: WaterfallStepContext) {
         if (step.result) {
             const accountName = step.result;
-            console.log(accountName);
+            
             let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
             const res = await axios.get(url);
             const amountLeft = res.data;

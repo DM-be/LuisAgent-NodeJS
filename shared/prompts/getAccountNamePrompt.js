@@ -9,13 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
+const ACCOUNT_NAMES = ['accountb', 'accounta'];
 class GetAcountNamePrompt extends botbuilder_dialogs_1.TextPrompt {
     /**
      *
      */
     constructor(dialogId, botConfig, accountNameAccessor, onTurnAccessor) {
         super(dialogId, (prompt) => __awaiter(this, void 0, void 0, function* () {
-            return true; // always return true for now -- add validation later
+            const value = prompt.recognized.value;
+            if (ACCOUNT_NAMES.findIndex(acc => acc === value) === -1) {
+                yield prompt.context.sendActivity(`You dont have an account named ${value} please provide correct one`);
+                return false;
+            }
+            return true;
         }));
         this.dialogId = dialogId;
         this.botConfig = botConfig;

@@ -1,13 +1,22 @@
 import { StatePropertyAccessor } from 'botbuilder';
 import {  TextPrompt } from "botbuilder-dialogs";
 
+
+const ACCOUNT_NAMES = ['accountb', 'accounta'];
+
 export class GetAcountNamePrompt extends TextPrompt {
     /**
      *
      */
     constructor(private dialogId: string,private botConfig: any, private accountNameAccessor: StatePropertyAccessor, private onTurnAccessor: StatePropertyAccessor) {
         super(dialogId, async prompt => {
-            return true; // always return true for now -- add validation later
+            const value = prompt.recognized.value;
+            if(ACCOUNT_NAMES.findIndex(acc => acc === value) === -1)
+            {
+                await prompt.context.sendActivity(`You dont have an account named ${value} please provide correct one`);
+                return false;
+            }
+            return true;
         });
 
         if (!dialogId) throw new Error('Need dialog ID');

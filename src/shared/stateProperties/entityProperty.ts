@@ -9,5 +9,13 @@ export class EntityProperty {
         if (!name || !value) throw new Error('Need name and value to create an entity');
     }
 
+    public getValue(): string {
+        return this.value;
+    }
+
+    public getName(): string  {
+        return this.name;
+    }
+
 
 }

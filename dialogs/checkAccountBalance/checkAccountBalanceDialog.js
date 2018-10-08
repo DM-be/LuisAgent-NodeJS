@@ -49,8 +49,8 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
             const onTurnProperty = yield this.onTurnAccessor.get(step.context);
             let accountName = onTurnProperty.getEntityByName('Account');
             if (accountName !== undefined) {
-                yield this.accountNameAccessor.set(step.context, accountName.value);
-                return yield step.next(accountName.value);
+                yield this.accountNameAccessor.set(step.context, accountName.getValue());
+                return yield step.next(accountName.getValue());
             }
             else
                 return yield step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
@@ -65,7 +65,6 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
         return __awaiter(this, void 0, void 0, function* () {
             if (step.result) {
                 const accountName = step.result;
-                console.log(accountName);
                 let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
                 const res = yield axios_1.default.get(url);
                 const amountLeft = res.data;

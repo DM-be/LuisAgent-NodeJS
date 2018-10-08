@@ -13,6 +13,12 @@ class EntityProperty {
         if (!name || !value)
             throw new Error('Need name and value to create an entity');
     }
+    getValue() {
+        return this.value;
+    }
+    getName() {
+        return this.name;
+    }
 }
 exports.EntityProperty = EntityProperty;
 //# sourceMappingURL=entityProperty.js.map
