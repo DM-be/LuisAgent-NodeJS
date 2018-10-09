@@ -38,7 +38,6 @@ const CONFIRM_DIALOG_STATE = 'confirmDialogState';
 // Turn.N here refers to all back and forth conversations beyond the initial trigger until the book table dialog is completed or cancelled.
 const GET_ACCOUNT_NAME_PROMPT = 'getAccountName';
 
-
 export class CheckAccountBalanceDialog extends ComponentDialog {
 
     static getName(): string {
@@ -64,8 +63,6 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
 
         this.addDialog(new GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT,
             botConfig,
-            accountNameAccessor,
-            onTurnAccessor,
             ));
     }
 
@@ -85,7 +82,6 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
     async checkAccountBalance(step: WaterfallStepContext) {
         if (step.result) {
             const accountName = step.result;
-            
             let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
             const res = await axios.get(url);
             const amountLeft = res.data;

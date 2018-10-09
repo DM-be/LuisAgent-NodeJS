@@ -39,7 +39,7 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
             this.askForAccountName.bind(this),
             this.checkAccountBalance.bind(this)
         ]));
-        this.addDialog(new getAccountNamePrompt_1.GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT, botConfig, accountNameAccessor, onTurnAccessor));
+        this.addDialog(new getAccountNamePrompt_1.GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT, botConfig));
     }
     static getName() {
         return CHECK_ACCOUNT_BALANCE;
