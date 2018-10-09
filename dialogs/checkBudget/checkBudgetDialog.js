@@ -23,17 +23,18 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
      * @param {Object} botConfig bot configuration
      * @param {StatePropertyAccessor} onTurnAccessor turn property accessor
      */
-    constructor(botConfig, onTurnAccessor) {
+    constructor(botConfig, onTurnAccessor, entityService) {
         super(CHECK_BUDGET);
         this.botConfig = botConfig;
         this.onTurnAccessor = onTurnAccessor;
+        this.entityService = entityService;
         // add dialogs
         // Water fall book table dialog
         this.addDialog(new botbuilder_dialogs_1.WaterfallDialog(CHECK_BUDGET_WATERFALL, [
             this.askForCategoryNameWithABudget.bind(this),
             this.checkBudget.bind(this)
         ]));
-        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig));
+        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig, entityService));
     }
     static getName() {
         return CHECK_BUDGET;
@@ -41,13 +42,18 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
     askForCategoryNameWithABudget(step) {
         return __awaiter(this, void 0, void 0, function* () {
             const onTurnProperty = yield this.onTurnAccessor.get(step.context);
-            let categoryName = onTurnProperty.getEntityByName('Category');
-            console.log(categoryName);
-            if (categoryName !== undefined) {
-                return yield step.next(categoryName.getValue());
+            let categoryEntityProperty = onTurnProperty.getEntityByName('Category');
+            if (categoryEntityProperty === undefined) {
+                return yield step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Van welke category wil je het budget zien?`);
             }
-            else
-                return yield step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Please give me a category name so I can check for you`);
+            else {
+                let categoryName = categoryEntityProperty.getValue()[0];
+                if (this.entityService.categoryNamesWithABudgetContains(categoryName)) {
+                    return yield step.next(categoryName);
+                }
+                else
+                    return yield step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Die category heeft geen budget. Geef opnieuw in`);
+            }
         });
     }
     /**
@@ -58,6 +64,7 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
     checkBudget(step) {
         return __awaiter(this, void 0, void 0, function* () {
             if (step.result) {
+                console.log(step.result);
                 const categoryName = step.result;
                 try {
                     let url = `https://nestjsbackend.herokuapp.com/budget/${categoryName}`;

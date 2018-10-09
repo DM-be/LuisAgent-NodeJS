@@ -1,4 +1,7 @@
 import {
+    EntityService
+} from './../../shared/helpers/entityService';
+import {
     OnTurnProperty
 } from './../../shared/stateProperties/onTurnProperty';
 import {
@@ -26,7 +29,9 @@ import axios, {
     AxiosRequestConfig,
     AxiosPromise
 } from 'axios';
-import { GetCategoryNameWithABudgetPrompt } from '../../shared/prompts/getCategoryNameWithABudgetPrompt';
+import {
+    GetCategoryNameWithABudgetPrompt
+} from '../../shared/prompts/getCategoryNameWithABudgetPrompt';
 
 
 
@@ -48,7 +53,7 @@ export class CheckBudgetDialog extends ComponentDialog {
      * @param {Object} botConfig bot configuration
      * @param {StatePropertyAccessor} onTurnAccessor turn property accessor
      */
-    constructor(private botConfig: any, private onTurnAccessor: StatePropertyAccessor) {
+    constructor(private botConfig: any, private onTurnAccessor: StatePropertyAccessor, private entityService: EntityService) {
         super(CHECK_BUDGET);
 
         // add dialogs
@@ -60,29 +65,39 @@ export class CheckBudgetDialog extends ComponentDialog {
 
         this.addDialog(new GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT,
             botConfig,
+            entityService
         ));
     }
 
-    public async askForCategoryNameWithABudget(step: WaterfallStepContext): Promise<DialogTurnResult<any>> {
+    public async askForCategoryNameWithABudget(step: WaterfallStepContext): Promise < DialogTurnResult < any >> {
         const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(step.context);
-        let categoryName = onTurnProperty.getEntityByName('Category');
-        console.log(categoryName);
-        if (categoryName !== undefined) {
-            return await step.next(categoryName.getValue());
-        } else return await step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Please give me a category name so I can check for you`);
+        let categoryEntityProperty = onTurnProperty.getEntityByName('Category');
+        if (categoryEntityProperty === undefined) {
+            return await step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Van welke category wil je het budget zien?`);
+        } else {
+            let categoryName = categoryEntityProperty.getValue()[0];
+            if (this.entityService.categoryNamesWithABudgetContains(categoryName)) {
+                return await step.next(categoryName);
+            } else return await step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Die category heeft geen budget. Geef opnieuw in`);
+        }
+
     }
     /**
      * Waterfall step to finalize user's response and return the balance of the account
      *
      * @param {WaterfallStepContext} WaterfallStepContext
      */
-    async checkBudget(step: WaterfallStepContext): Promise<DialogTurnResult<any>> {
+    async checkBudget(step: WaterfallStepContext): Promise < DialogTurnResult < any >> {
         if (step.result) {
+            console.log(step.result);
             const categoryName = step.result;
             try {
                 let url = `https://nestjsbackend.herokuapp.com/budget/${categoryName}`;
                 const res = await axios.get(url);
-                const budget: {limitAmount: number, currentAmountSpent: number} = res.data;
+                const budget: {
+                    limitAmount: number,
+                    currentAmountSpent: number
+                } = res.data;
                 const remaining = budget.limitAmount - budget.currentAmountSpent;
                 await step.context.sendActivity(`Your remaining budget in ${categoryName} is ${remaining}`);
             } catch (error) {

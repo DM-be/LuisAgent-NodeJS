@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const entityService_1 = require("./../../shared/helpers/entityService");
 const checkBudgetDialog_1 = require("./../checkBudget/checkBudgetDialog");
 const checkAccountBalanceDialog_1 = require("./../checkAccountBalance/checkAccountBalanceDialog");
 const whatCanYouDo_1 = require("./../whatCanYouDo/whatCanYouDo");
@@ -56,6 +57,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
         this.userProfileAccessor = conversationState.createProperty(USER_PROFILE_PROPERTY);
         this.mainDispatcherAccessor = conversationState.createProperty(MAIN_DISPATCHER_STATE_PROPERTY);
         this.accountNameAccessor = conversationState.createProperty(ACCOUNT_NAME_PROPERTY);
+        this.entityService = new entityService_1.EntityService();
         this.dialogs = new botbuilder_dialogs_1.DialogSet(this.mainDispatcherAccessor);
         this.addDialog(new whatCanYouDo_1.WhatCanYouDoDialog());
         this.addDialog(new botbuilder_dialogs_1.TextPrompt(ACCOUNT_PROMPT));
@@ -64,7 +66,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
         this.addDialog(new checkAccountBalanceDialog_1.CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor));
-        this.addDialog(new checkBudgetDialog_1.CheckBudgetDialog(botConfig, onTurnAccessor));
+        this.addDialog(new checkBudgetDialog_1.CheckBudgetDialog(botConfig, onTurnAccessor, this.entityService));
     }
     static getName() {
         return MAIN_DISPATCHER_DIALOG;

@@ -1,3 +1,4 @@
+import { EntityService } from './../../shared/helpers/entityService';
 import { CheckBudgetDialog } from './../checkBudget/checkBudgetDialog';
 import { CheckAccountBalanceDialog } from './../checkAccountBalance/checkAccountBalanceDialog';
 import { OnTurnProperty } from './../../shared/stateProperties/onTurnProperty';
@@ -11,7 +12,7 @@ import {
     ConversationState,
     MessageFactory
 } from "botbuilder";
-import { ResourceResponse } from 'botframework-connector/lib/generated/models/mappers';
+import { ResourceResponse, Entity } from 'botframework-connector/lib/generated/models/mappers';
 
 // dialog name
 const MAIN_DISPATCHER_DIALOG = 'MainDispatcherDialog';
@@ -43,6 +44,7 @@ export class MainDispatcher extends ComponentDialog {
     private userProfileAccessor: StatePropertyAccessor;
     private mainDispatcherAccessor: StatePropertyAccessor;
     private accountNameAccessor: StatePropertyAccessor;
+    private entityService: EntityService;
    // private dialogs: DialogSet;
 
  /**
@@ -68,6 +70,9 @@ export class MainDispatcher extends ComponentDialog {
         this.mainDispatcherAccessor = conversationState.createProperty(MAIN_DISPATCHER_STATE_PROPERTY);
         this.accountNameAccessor = conversationState.createProperty(ACCOUNT_NAME_PROPERTY);
         
+        this.entityService = new EntityService();
+
+
         this.dialogs = new DialogSet(this.mainDispatcherAccessor);
         this.addDialog(new WhatCanYouDoDialog());
         this.addDialog(new TextPrompt(ACCOUNT_PROMPT));
@@ -76,7 +81,7 @@ export class MainDispatcher extends ComponentDialog {
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
         this.addDialog(new CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor))
-        this.addDialog(new CheckBudgetDialog(botConfig, onTurnAccessor));
+        this.addDialog(new CheckBudgetDialog(botConfig, onTurnAccessor, this.entityService));
         
 
     }
