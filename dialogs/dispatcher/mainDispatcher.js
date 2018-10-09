@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const checkBudgetDialog_1 = require("./../checkBudget/checkBudgetDialog");
 const checkAccountBalanceDialog_1 = require("./../checkAccountBalance/checkAccountBalanceDialog");
 const whatCanYouDo_1 = require("./../whatCanYouDo/whatCanYouDo");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
@@ -63,6 +64,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
         this.addDialog(new checkAccountBalanceDialog_1.CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor));
+        this.addDialog(new checkBudgetDialog_1.CheckBudgetDialog(botConfig, onTurnAccessor));
     }
     static getName() {
         return MAIN_DISPATCHER_DIALOG;
@@ -174,6 +176,8 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
                 //return await dc.endDialog();
                 // return await this.beginWhatCanYouDoDialog(dc, onTurnProperty);
                 // return
+                case 'checkBudget':
+                    return yield dc.beginDialog(checkBudgetDialog_1.CheckBudgetDialog.getName());
                 case NONE_INTENT:
                 default:
                     yield dc.context.sendActivity(`I'm still learning.. Sorry, I do not know how to help you with that.`);

@@ -3,7 +3,8 @@ import {
 } from './../../shared/stateProperties/onTurnProperty';
 import {
     WaterfallStep,
-    WaterfallStepContext
+    WaterfallStepContext,
+    DialogTurnResult
 } from 'botbuilder-dialogs';
 import {
     GetAcountNamePrompt
@@ -63,14 +64,14 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
 
         this.addDialog(new GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT,
             botConfig,
-            ));
+        ));
     }
 
-    public async askForAccountName(step: WaterfallStepContext) {
+    public async askForAccountName(step: WaterfallStepContext): Promise<DialogTurnResult<any>> {
         const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(step.context);
         let accountName = onTurnProperty.getEntityByName('Account');
         if (accountName !== undefined) {
-            await this.accountNameAccessor.set(step.context, accountName.getValue());
+         //   await this.accountNameAccessor.set(step.context, accountName.getValue());
             return await step.next(accountName.getValue());
         } else return await step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
     }
@@ -79,13 +80,18 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
      *
      * @param {WaterfallStepContext} WaterfallStepContext
      */
-    async checkAccountBalance(step: WaterfallStepContext) {
+    async checkAccountBalance(step: WaterfallStepContext): Promise<DialogTurnResult<any>> {
         if (step.result) {
             const accountName = step.result;
-            let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
-            const res = await axios.get(url);
-            const amountLeft = res.data;
-            await step.context.sendActivity(`The balance on ${accountName} is ${amountLeft}`);
+            try {
+                let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
+                const res = await axios.get(url);
+                const amountLeft = res.data;
+                await step.context.sendActivity(`The balance on ${accountName} is ${amountLeft}`);
+            } catch (error) {
+                console.log(error);
+                await step.context.sendActivity(`something went wrong...`);
+            }
         }
         return await step.endDialog();
     }

@@ -136,12 +136,7 @@ class BasicBot {
                 // prevent calling luis on just a username
                 // todo: find more elegant solution
                 if (username !== turnContext.activity.text) {
-                    const results = yield this.luisRecognizer.recognize(turnContext);
-                    const topIntent = botbuilder_ai_1.LuisRecognizer.topIntent(results);
-                    switch (topIntent) {
-                        case CHECKACCOUNT_INTENT:
-                            yield dc.beginDialog(mainDispatcher_1.MainDispatcher.getName());
-                    }
+                    yield dc.beginDialog(mainDispatcher_1.MainDispatcher.getName());
                 }
             }
             // Handle ConversationUpdate activity type, which is used to indicates new members add to 

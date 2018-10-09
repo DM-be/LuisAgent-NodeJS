@@ -1,3 +1,4 @@
+import { CheckBudgetDialog } from './../checkBudget/checkBudgetDialog';
 import { CheckAccountBalanceDialog } from './../checkAccountBalance/checkAccountBalanceDialog';
 import { OnTurnProperty } from './../../shared/stateProperties/onTurnProperty';
 import { WhatCanYouDoDialog } from './../whatCanYouDo/whatCanYouDo';
@@ -75,6 +76,7 @@ export class MainDispatcher extends ComponentDialog {
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
         this.addDialog(new CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor))
+        this.addDialog(new CheckBudgetDialog(botConfig, onTurnAccessor));
         
 
     }
@@ -191,6 +193,10 @@ export class MainDispatcher extends ComponentDialog {
                 //return await dc.endDialog();
            // return await this.beginWhatCanYouDoDialog(dc, onTurnProperty);
               // return
+           
+            case 'checkBudget':
+            return await dc.beginDialog(CheckBudgetDialog.getName());
+            
             case NONE_INTENT:
             default:
                 await dc.context.sendActivity(`I'm still learning.. Sorry, I do not know how to help you with that.`);

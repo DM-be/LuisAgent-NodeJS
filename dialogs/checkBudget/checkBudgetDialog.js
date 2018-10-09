@@ -8,52 +8,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const getAccountNamePrompt_1 = require("./../../shared/prompts/getAccountNamePrompt");
 const botbuilder_dialogs_1 = require("botbuilder-dialogs");
 const axios_1 = require("axios");
+const getCategoryNameWithABudgetPrompt_1 = require("../../shared/prompts/getCategoryNameWithABudgetPrompt");
 // This dialog's name. Also matches the name of the intent from ../dispatcher/resources/checkAccountBalance.lu
 // LUIS recognizer replaces spaces ' ' with '_'. So intent name 'Who are you' is recognized as 'Who_are_you'.
-const CHECK_ACCOUNT_BALANCE = 'check_account_balance';
-const CHECK_ACCOUNT_BALANCE_WATERFALL = 'checkAccountBalanceWaterfall';
-const GET_LOCATION_DIALOG_STATE = 'getLocDialogState';
-const CONFIRM_DIALOG_STATE = 'confirmDialogState';
-// Turn.N here refers to all back and forth conversations beyond the initial trigger until the book table dialog is completed or cancelled.
-const GET_ACCOUNT_NAME_PROMPT = 'getAccountName';
-class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
+const CHECK_BUDGET = 'check_budget';
+const CHECK_BUDGET_WATERFALL = 'checkAccountBalanceWaterfall';
+const GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT = 'getCategoryNameWithABudget';
+class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
     /**
      * Constructor
      * // todo adjust params etc
      * @param {Object} botConfig bot configuration
-     * @param {Object} accessor for on turn
-     * @param {Object} accessor for the dialog
-     * @param {Object} conversation state object
+     * @param {StatePropertyAccessor} onTurnAccessor turn property accessor
      */
-    constructor(botConfig, accountNameAccessor, onTurnAccessor) {
-        super(CHECK_ACCOUNT_BALANCE);
+    constructor(botConfig, onTurnAccessor) {
+        super(CHECK_BUDGET);
         this.botConfig = botConfig;
-        this.accountNameAccessor = accountNameAccessor;
         this.onTurnAccessor = onTurnAccessor;
         // add dialogs
         // Water fall book table dialog
-        this.addDialog(new botbuilder_dialogs_1.WaterfallDialog(CHECK_ACCOUNT_BALANCE_WATERFALL, [
-            this.askForAccountName.bind(this),
-            this.checkAccountBalance.bind(this)
+        this.addDialog(new botbuilder_dialogs_1.WaterfallDialog(CHECK_BUDGET_WATERFALL, [
+            this.askForCategoryNameWithABudget.bind(this),
+            this.checkBudget.bind(this)
         ]));
-        this.addDialog(new getAccountNamePrompt_1.GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT, botConfig));
+        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig));
     }
     static getName() {
-        return CHECK_ACCOUNT_BALANCE;
+        return CHECK_BUDGET;
     }
-    askForAccountName(step) {
+    askForCategoryNameWithABudget(step) {
         return __awaiter(this, void 0, void 0, function* () {
             const onTurnProperty = yield this.onTurnAccessor.get(step.context);
-            let accountName = onTurnProperty.getEntityByName('Account');
-            if (accountName !== undefined) {
-                //   await this.accountNameAccessor.set(step.context, accountName.getValue());
-                return yield step.next(accountName.getValue());
+            let categoryName = onTurnProperty.getEntityByName('Category');
+            console.log(categoryName);
+            if (categoryName !== undefined) {
+                return yield step.next(categoryName.getValue());
             }
             else
-                return yield step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
+                return yield step.prompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, `Please give me a category name so I can check for you`);
         });
     }
     /**
@@ -61,15 +55,16 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
      *
      * @param {WaterfallStepContext} WaterfallStepContext
      */
-    checkAccountBalance(step) {
+    checkBudget(step) {
         return __awaiter(this, void 0, void 0, function* () {
             if (step.result) {
-                const accountName = step.result;
+                const categoryName = step.result;
                 try {
-                    let url = `https://nestjsbackend.herokuapp.com/accounts/${accountName}`;
+                    let url = `https://nestjsbackend.herokuapp.com/budget/${categoryName}`;
                     const res = yield axios_1.default.get(url);
-                    const amountLeft = res.data;
-                    yield step.context.sendActivity(`The balance on ${accountName} is ${amountLeft}`);
+                    const budget = res.data;
+                    const remaining = budget.limitAmount - budget.currentAmountSpent;
+                    yield step.context.sendActivity(`Your remaining budget in ${categoryName} is ${remaining}`);
                 }
                 catch (error) {
                     console.log(error);
@@ -80,5 +75,5 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
         });
     }
 }
-exports.CheckAccountBalanceDialog = CheckAccountBalanceDialog;
-//# sourceMappingURL=checkAccountBalanceDialog.js.map
+exports.CheckBudgetDialog = CheckBudgetDialog;
+//# sourceMappingURL=checkBudgetDialog.js.map

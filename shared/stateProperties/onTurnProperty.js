@@ -41,7 +41,7 @@ class OnTurnProperty {
      * @returns {OnTurnProperty}
      */
     static getOnTurnPropertyFromLuisResults(LUISResults) {
-        let LUIS_ENTITIES = ['Account']; // add more in central helper
+        let LUIS_ENTITIES = ['Account', 'Category']; // add more in central helper
         let onTurnProperty = new OnTurnProperty();
         onTurnProperty.setIntent(botbuilder_ai_1.LuisRecognizer.topIntent(LUISResults));
         // Gather entity values if available. Uses a const list of LUIS entity names.
