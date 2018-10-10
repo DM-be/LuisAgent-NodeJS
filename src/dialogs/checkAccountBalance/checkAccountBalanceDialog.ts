@@ -1,3 +1,4 @@
+import { EntityService } from './../../shared/helpers/entityService';
 import {
     OnTurnProperty
 } from './../../shared/stateProperties/onTurnProperty';
@@ -52,7 +53,7 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
      * @param {Object} accessor for the dialog
      * @param {Object} conversation state object
      */
-    constructor(private botConfig: any, private accountNameAccessor: StatePropertyAccessor, private onTurnAccessor: StatePropertyAccessor) {
+    constructor(private botConfig: any, private onTurnAccessor: StatePropertyAccessor, private entityService: EntityService) {
         super(CHECK_ACCOUNT_BALANCE);
 
         // add dialogs
@@ -64,16 +65,25 @@ export class CheckAccountBalanceDialog extends ComponentDialog {
 
         this.addDialog(new GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT,
             botConfig,
+            onTurnAccessor,
+            entityService
         ));
     }
 
     public async askForAccountName(step: WaterfallStepContext): Promise<DialogTurnResult<any>> {
         const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(step.context);
-        let accountName = onTurnProperty.getEntityByName('Account');
-        if (accountName !== undefined) {
-         //   await this.accountNameAccessor.set(step.context, accountName.getValue());
-            return await step.next(accountName.getValue());
-        } else return await step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
+        let accountNameEntityProperty = onTurnProperty.getEntityByName('Account');
+        if (accountNameEntityProperty === undefined) {
+            return await step.prompt(GET_ACCOUNT_NAME_PROMPT, `Van welke account wil je je balans zien?`);
+        }
+        else {
+            let accountName = accountNameEntityProperty.getValue()[0];
+            if(this.entityService.accountNamesContains(accountName)) {
+                return await step.next(accountName);
+            }
+         else return await step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
+        }
+            
     }
     /**
      * Waterfall step to finalize user's response and return the balance of the account

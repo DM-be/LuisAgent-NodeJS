@@ -65,8 +65,8 @@ export class CheckBudgetDialog extends ComponentDialog {
 
         this.addDialog(new GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT,
             botConfig,
-            entityService,
-            onTurnAccessor
+            onTurnAccessor,
+            entityService
         ));
     }
 

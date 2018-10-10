@@ -28,18 +28,18 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
      * @param {Object} accessor for the dialog
      * @param {Object} conversation state object
      */
-    constructor(botConfig, accountNameAccessor, onTurnAccessor) {
+    constructor(botConfig, onTurnAccessor, entityService) {
         super(CHECK_ACCOUNT_BALANCE);
         this.botConfig = botConfig;
-        this.accountNameAccessor = accountNameAccessor;
         this.onTurnAccessor = onTurnAccessor;
+        this.entityService = entityService;
         // add dialogs
         // Water fall book table dialog
         this.addDialog(new botbuilder_dialogs_1.WaterfallDialog(CHECK_ACCOUNT_BALANCE_WATERFALL, [
             this.askForAccountName.bind(this),
             this.checkAccountBalance.bind(this)
         ]));
-        this.addDialog(new getAccountNamePrompt_1.GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT, botConfig));
+        this.addDialog(new getAccountNamePrompt_1.GetAcountNamePrompt(GET_ACCOUNT_NAME_PROMPT, botConfig, onTurnAccessor, entityService));
     }
     static getName() {
         return CHECK_ACCOUNT_BALANCE;
@@ -47,13 +47,18 @@ class CheckAccountBalanceDialog extends botbuilder_dialogs_1.ComponentDialog {
     askForAccountName(step) {
         return __awaiter(this, void 0, void 0, function* () {
             const onTurnProperty = yield this.onTurnAccessor.get(step.context);
-            let accountName = onTurnProperty.getEntityByName('Account');
-            if (accountName !== undefined) {
-                //   await this.accountNameAccessor.set(step.context, accountName.getValue());
-                return yield step.next(accountName.getValue());
+            let accountNameEntityProperty = onTurnProperty.getEntityByName('Account');
+            if (accountNameEntityProperty === undefined) {
+                return yield step.prompt(GET_ACCOUNT_NAME_PROMPT, `Van welke account wil je je balans zien?`);
             }
-            else
-                return yield step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
+            else {
+                let accountName = accountNameEntityProperty.getValue()[0];
+                if (this.entityService.accountNamesContains(accountName)) {
+                    return yield step.next(accountName);
+                }
+                else
+                    return yield step.prompt(GET_ACCOUNT_NAME_PROMPT, `What's the name of the account you want to check?`);
+            }
         });
     }
     /**

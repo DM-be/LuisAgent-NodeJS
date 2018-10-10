@@ -65,7 +65,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
             this.askForAccountLabel.bind(this),
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
-        this.addDialog(new checkAccountBalanceDialog_1.CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor));
+        this.addDialog(new checkAccountBalanceDialog_1.CheckAccountBalanceDialog(botConfig, onTurnAccessor, this.entityService));
         this.addDialog(new checkBudgetDialog_1.CheckBudgetDialog(botConfig, onTurnAccessor, this.entityService));
     }
     static getName() {

@@ -12,12 +12,13 @@ const botbuilder_dialogs_1 = require("botbuilder-dialogs");
 class GetCategoryNameWithABudgetPrompt extends botbuilder_dialogs_1.TextPrompt {
     /**
      * custom prompt for getting a categoryName, with a budget, and validating it against known categories containing a tracked budget
+     * overrides the continueDialog to check for cancel,... intents
      * @param {String []} categoryNamesWithABudget variable holding categoryNames for the validator, gets filled on constructing via a promise
      */
-    constructor(dialogId, botConfig, entityService, onTurnAccessor) {
+    constructor(dialogId, botConfig, onTurnAccessor, entityService) {
         super(dialogId, (prompt) => __awaiter(this, void 0, void 0, function* () {
             const value = prompt.recognized.value.toLowerCase();
-            if (entityService.getCategoryNamesWithABudget().findIndex(acc => acc === value) === -1) {
+            if (!entityService.categoryNamesWithABudgetContains(value)) {
                 yield prompt.context.sendActivity(`You dont have a category named ${value} with a tracked budget, please provide correct one`);
                 return false;
             }
@@ -25,32 +26,35 @@ class GetCategoryNameWithABudgetPrompt extends botbuilder_dialogs_1.TextPrompt {
         }));
         this.dialogId = dialogId;
         this.botConfig = botConfig;
-        this.entityService = entityService;
         this.onTurnAccessor = onTurnAccessor;
+        this.entityService = entityService;
         if (!dialogId)
             throw new Error('Need dialog ID');
         if (!botConfig)
             throw new Error('Need bot configuration');
+        if (!onTurnAccessor)
+            throw new Error('Need onturnaccessor!');
     }
     /**
-        * Override dialogContinue.
-        *   The override enables
-        *     Interruption to be kicked off from right within this dialog.
-        *     Ability to leverage a dedicated LUIS model to provide flexible entity filling,
-        *     corrections and contextual help.
-        *
-        * @param {DialogContext} dialog context
-        */
+     * Override continueDialog.
+     *   The override enables
+     *     recognizing the cancel intent to cancel the dialog
+     *     todo: recognizing other intents and resolving them appropiatly
+     *     ...
+     * @param {DialogContext} dc context
+     */
     continueDialog(dc) {
         const _super = name => super[name];
         return __awaiter(this, void 0, void 0, function* () {
             let turnContext = dc.context;
-            let step = dc.activeDialog.state;
+            // let step = dc.activeDialog.state;
             const onTurnProperty = yield this.onTurnAccessor.get(turnContext);
             switch (onTurnProperty.getIntent()) {
                 case 'Cancel':
                     yield dc.context.sendActivity('ok ill cancel this conversation for you :)');
                     return yield dc.cancelAllDialogs();
+                case 'None':
+                    return yield _super("continueDialog").call(this, dc);
                 default:
                     return yield _super("continueDialog").call(this, dc);
             }

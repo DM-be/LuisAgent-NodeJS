@@ -13,6 +13,7 @@ class EntityService {
     constructor() {
         this.setCategoryNamesWithABudget();
         this.setEntityNames();
+        this.setAccountNames();
     }
     setEntityNames() {
         this.entityNames = ['Account', 'Category'];
@@ -22,6 +23,13 @@ class EntityService {
             let url = `https://nestjsbackend.herokuapp.com/category/`;
             let res = yield axios_1.default.get(url);
             this.categoryNames = res.data;
+        });
+    }
+    setAccountNames() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = `https://nestjsbackend.herokuapp.com/accounts/`;
+            const { data } = yield axios_1.default.get(url);
+            this.accountNames = data;
         });
     }
     setCategoryNamesWithABudget() {
@@ -39,6 +47,9 @@ class EntityService {
     }
     categoryNamesWithABudgetContains(categoryName) {
         return (this.categoryNamesWithABudget.findIndex(cat => cat === categoryName) !== -1);
+    }
+    accountNamesContains(accountName) {
+        return (this.accountNames.findIndex(acc => acc === accountName) !== -1);
     }
 }
 exports.EntityService = EntityService;

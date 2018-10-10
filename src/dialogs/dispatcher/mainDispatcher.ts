@@ -80,7 +80,7 @@ export class MainDispatcher extends ComponentDialog {
             this.askForAccountLabel.bind(this),
             this.collectAndDisplayAccountLabel.bind(this)
         ]));
-        this.addDialog(new CheckAccountBalanceDialog(botConfig, this.accountNameAccessor, onTurnAccessor))
+        this.addDialog(new CheckAccountBalanceDialog(botConfig, onTurnAccessor, this.entityService))
         this.addDialog(new CheckBudgetDialog(botConfig, onTurnAccessor, this.entityService));
         
 

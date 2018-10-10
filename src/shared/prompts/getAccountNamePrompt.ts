@@ -1,14 +1,17 @@
+import { OnTurnProperty } from './../stateProperties/onTurnProperty';
 import {
     StatePropertyAccessor
 } from 'botbuilder';
 import {
     TextPrompt,
-    PromptValidatorContext
+    PromptValidatorContext,
+    DialogContext
 } from "botbuilder-dialogs";
 import axios, {
     AxiosRequestConfig,
     AxiosPromise
 } from 'axios';
+import { EntityService } from '../helpers/entityService';
 
 
 export class GetAcountNamePrompt extends TextPrompt {
@@ -17,11 +20,10 @@ export class GetAcountNamePrompt extends TextPrompt {
      * custom prompt for getting an accountName and validating it against the known accounts of the user
      * @param {String []} accountNames variable holding accountNames for the validator, gets filled on constructing via a promise
      */
-    constructor(private dialogId: string, private botConfig: any) {
+    constructor(private dialogId: string, private botConfig: any, private onTurnAccessor: StatePropertyAccessor, private entityService: EntityService) {
         super(dialogId, async (prompt: PromptValidatorContext < string > ) => {
-            this.accountNames = await this.getAllAccounts();
             const value = prompt.recognized.value.toLowerCase();
-            if (this.accountNames.findIndex(acc => acc === value) === -1) {
+            if (!entityService.accountNamesContains(value)) {
                 await prompt.context.sendActivity(`You dont have an account named ${value} please provide correct one`);
                 return false;
             }
@@ -30,20 +32,31 @@ export class GetAcountNamePrompt extends TextPrompt {
 
         if (!dialogId) throw new Error('Need dialog ID');
         if (!botConfig) throw new Error('Need bot configuration');
+        if (!entityService) throw new Error('Need entity service');
+        if (!onTurnAccessor) throw new Error('Need onturnaccessor');
     }
+    
     /**
-     * Method to get all account names associated with user
-     * 
-     * @returns {Promise <string []>} Promise resolves in array of strings, if error an array with a single empty string
+     * Override continueDialog.
+     *   The override enables
+     *     recognizing the cancel intent to cancel the dialog
+     *     todo: recognizing other intents and resolving them appropiatly
+     *     ...
+     * @param {DialogContext} dc context
      */
-    public async getAllAccounts(): Promise < string[] > {
-        try {
-            let url = `https://nestjsbackend.herokuapp.com/accounts/`;
-            const res = await axios.get(url);
-            return res.data;
-        } catch (error) {
-            console.log('error occured in getting all accounts');
-            return [''];
+    async continueDialog(dc: DialogContext) {
+        let turnContext = dc.context;
+        // let step = dc.activeDialog.state;
+        const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(turnContext);
+        switch (onTurnProperty.getIntent()) {
+            case 'Cancel':
+                await dc.context.sendActivity('ok ill cancel this conversation for you :)');
+                return await dc.cancelAllDialogs();
+            case 'None':
+                return await super.continueDialog(dc);
+            default:
+                return await super.continueDialog(dc);
         }
     }
+    
 }

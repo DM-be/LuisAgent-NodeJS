@@ -26,7 +26,7 @@ export class GetCategoryNameWithABudgetPrompt extends TextPrompt {
      * @param {String []} categoryNamesWithABudget variable holding categoryNames for the validator, gets filled on constructing via a promise
      */
 
-    constructor(private dialogId: string, private botConfig: any, private entityService: EntityService, private onTurnAccessor: StatePropertyAccessor) {
+    constructor(private dialogId: string, private botConfig: any, private onTurnAccessor: StatePropertyAccessor, private entityService: EntityService) {
         super(dialogId, async (prompt: PromptValidatorContext < string > ) => {
             const value = prompt.recognized.value.toLowerCase();
             if (!entityService.categoryNamesWithABudgetContains(value)) {

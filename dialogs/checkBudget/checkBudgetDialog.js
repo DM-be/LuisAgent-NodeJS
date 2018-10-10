@@ -34,7 +34,7 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
             this.askForCategoryNameWithABudget.bind(this),
             this.checkBudget.bind(this)
         ]));
-        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig, entityService, onTurnAccessor));
+        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig, onTurnAccessor, entityService));
     }
     static getName() {
         return CHECK_BUDGET;
