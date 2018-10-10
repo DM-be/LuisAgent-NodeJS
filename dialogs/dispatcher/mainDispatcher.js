@@ -124,7 +124,6 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
         return __awaiter(this, void 0, void 0, function* () {
             // get on turn property through the property accessor
             const onTurnProperty = yield this.onTurnAccessor.get(dc.context);
-            console.log(onTurnProperty);
             // Evaluate if the requested operation is possible/ allowed.
             // const reqOpStatus = await this.isRequestedOperationPossible(dc.activeDialog, onTurnProperty.intent);
             // if (!reqOpStatus.allowed) {
@@ -143,6 +142,7 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
             }
             if (dialogTurnResult === undefined)
                 return yield dc.endDialog();
+            console.log(dialogTurnResult.status);
             // Examine result from dc.continue() or from the call to beginChildDialog().
             switch (dialogTurnResult.status) {
                 case botbuilder_dialogs_1.DialogTurnStatus.complete: {
@@ -180,6 +180,8 @@ class MainDispatcher extends botbuilder_dialogs_1.ComponentDialog {
                 // return
                 case 'checkBudget':
                     return yield dc.beginDialog(checkBudgetDialog_1.CheckBudgetDialog.getName());
+                // case 'Cancel':
+                //     return await dc.context.sendActivity('OK i cancelled');
                 case NONE_INTENT:
                 default:
                     yield dc.context.sendActivity(`I'm still learning.. Sorry, I do not know how to help you with that.`);

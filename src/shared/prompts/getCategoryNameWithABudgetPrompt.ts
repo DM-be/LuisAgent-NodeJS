@@ -4,12 +4,14 @@ import {
 } from 'botbuilder';
 import {
     TextPrompt,
-    PromptValidatorContext
+    PromptValidatorContext,
+    DialogContext
 } from "botbuilder-dialogs";
 import axios, {
     AxiosRequestConfig,
     AxiosPromise
 } from 'axios';
+import { OnTurnProperty } from '../stateProperties/onTurnProperty';
 
 
 export class GetCategoryNameWithABudgetPrompt extends TextPrompt {
@@ -20,7 +22,7 @@ export class GetCategoryNameWithABudgetPrompt extends TextPrompt {
      */
 
     
-    constructor(private dialogId: string, private botConfig: any, private entityService: EntityService) {
+    constructor(private dialogId: string, private botConfig: any, private entityService: EntityService, private onTurnAccessor: StatePropertyAccessor) {
         super(dialogId, async (prompt: PromptValidatorContext < string > ) => {
              
             const value = prompt.recognized.value.toLowerCase();
@@ -28,10 +30,35 @@ export class GetCategoryNameWithABudgetPrompt extends TextPrompt {
                 await prompt.context.sendActivity(`You dont have a category named ${value} with a tracked budget, please provide correct one`);
                 return false;
             }
+            
             return true;
         });
         if (!dialogId) throw new Error('Need dialog ID');
         if (!botConfig) throw new Error('Need bot configuration');
     }
  
+     /**
+         * Override dialogContinue.
+         *   The override enables
+         *     recognizing the cancel intent to cancel the dialog
+         *
+         * @param {DialogContext} dc context
+         */
+        async continueDialog(dc: DialogContext) {
+            let turnContext = dc.context;
+           // let step = dc.activeDialog.state;
+            const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(turnContext);
+            switch (onTurnProperty.getIntent()) {
+                case 'Cancel':
+                await dc.context.sendActivity('ok ill cancel this conversation for you :)');
+                return await dc.cancelAllDialogs();
+                case 'None':
+                return await super.continueDialog(dc);
+                default:
+                return await super.continueDialog(dc);
+            }
+
+
+
+        }
 }

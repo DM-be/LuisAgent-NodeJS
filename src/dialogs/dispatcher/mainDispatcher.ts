@@ -139,9 +139,8 @@ export class MainDispatcher extends ComponentDialog {
 
         async mainDispatch(dc: DialogContext) {
             // get on turn property through the property accessor
-            const onTurnProperty = await this.onTurnAccessor.get(dc.context);
-            console.log(onTurnProperty);
-  
+            const onTurnProperty: OnTurnProperty = await this.onTurnAccessor.get(dc.context);
+            
 
             // Evaluate if the requested operation is possible/ allowed.
             // const reqOpStatus = await this.isRequestedOperationPossible(dc.activeDialog, onTurnProperty.intent);
@@ -163,6 +162,7 @@ export class MainDispatcher extends ComponentDialog {
             }
 
             if (dialogTurnResult === undefined) return await dc.endDialog();
+            console.log(dialogTurnResult.status);
 
             // Examine result from dc.continue() or from the call to beginChildDialog().
             switch (dialogTurnResult.status) {
@@ -201,7 +201,8 @@ export class MainDispatcher extends ComponentDialog {
            
             case 'checkBudget':
             return await dc.beginDialog(CheckBudgetDialog.getName());
-            
+            // case 'Cancel':
+            //     return await dc.context.sendActivity('OK i cancelled');
             case NONE_INTENT:
             default:
                 await dc.context.sendActivity(`I'm still learning.. Sorry, I do not know how to help you with that.`);

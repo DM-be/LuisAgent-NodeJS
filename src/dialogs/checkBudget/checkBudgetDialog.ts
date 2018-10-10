@@ -65,7 +65,8 @@ export class CheckBudgetDialog extends ComponentDialog {
 
         this.addDialog(new GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT,
             botConfig,
-            entityService
+            entityService,
+            onTurnAccessor
         ));
     }
 
@@ -94,14 +95,13 @@ export class CheckBudgetDialog extends ComponentDialog {
             try {
                 let url = `https://nestjsbackend.herokuapp.com/budget/${categoryName}`;
                 const res = await axios.get(url);
-                const budget: {
-                    limitAmount: number,
-                    currentAmountSpent: number
+                const {
+                    limitAmount,
+                    currentAmountSpent
                 } = res.data;
-                const remaining = budget.limitAmount - budget.currentAmountSpent;
+                const remaining = limitAmount - currentAmountSpent;
                 await step.context.sendActivity(`Your remaining budget in ${categoryName} is ${remaining}`);
             } catch (error) {
-                console.log(error);
                 await step.context.sendActivity(`something went wrong...`);
             }
         }

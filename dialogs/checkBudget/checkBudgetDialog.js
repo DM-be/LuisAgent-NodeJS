@@ -34,7 +34,7 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
             this.askForCategoryNameWithABudget.bind(this),
             this.checkBudget.bind(this)
         ]));
-        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig, entityService));
+        this.addDialog(new getCategoryNameWithABudgetPrompt_1.GetCategoryNameWithABudgetPrompt(GET_CATEGORY_NAME_WITH_A_BUDGET_PROMPT, botConfig, entityService, onTurnAccessor));
     }
     static getName() {
         return CHECK_BUDGET;
@@ -69,12 +69,11 @@ class CheckBudgetDialog extends botbuilder_dialogs_1.ComponentDialog {
                 try {
                     let url = `https://nestjsbackend.herokuapp.com/budget/${categoryName}`;
                     const res = yield axios_1.default.get(url);
-                    const budget = res.data;
-                    const remaining = budget.limitAmount - budget.currentAmountSpent;
+                    const { limitAmount, currentAmountSpent } = res.data;
+                    const remaining = limitAmount - currentAmountSpent;
                     yield step.context.sendActivity(`Your remaining budget in ${categoryName} is ${remaining}`);
                 }
                 catch (error) {
-                    console.log(error);
                     yield step.context.sendActivity(`something went wrong...`);
                 }
             }
